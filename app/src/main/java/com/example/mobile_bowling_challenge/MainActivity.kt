@@ -30,7 +30,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             Mobile_Bowling_ChallengeTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    BowlingScreen(BowlingGameImpl(), modifier = Modifier.padding(innerPadding))
+                    BowlingScreen(
+                        bowlingGame = BowlingGameImpl(),
+                        modifier = Modifier.padding(innerPadding)
+                    )
                 }
             }
         }
@@ -38,7 +41,10 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun BowlingScreen(bowlingGame: BowlingGameImpl, modifier: Modifier = Modifier) {
+fun BowlingScreen(
+    bowlingGame: BowlingGameImpl,
+    modifier: Modifier = Modifier
+) {
     var pins by remember { mutableIntStateOf(0) }
 
     Column(modifier = modifier) {
@@ -73,20 +79,36 @@ fun BowlingGameStateView(frames: List<Frame>) {
     // Render frames and their respective scores
     LazyColumn {
         items(frames) { frame ->
-            Text(text = "Rolls: ${frame.rolls.joinToString(", ")} Score: ${frame.score}")
+            // Create a string that represents the rolls with their appropriate display
+            val rollDisplay = frame.rolls.zip(frame.rollTypes) { pins, rollType ->
+                // Check the roll type and display corresponding symbol or pin count as string
+                when (rollType) {
+                    RollType.STRIKE -> RollType.STRIKE.symbol
+                    RollType.SPARE -> RollType.SPARE.symbol
+                    RollType.MISS -> RollType.MISS.symbol
+                    RollType.REGULAR -> pins.toString() // Regular roll shows the number of pins
+                }
+            }.joinToString(", ")
+
+            // Display the rolls and their types (symbols or numbers as strings)
+            Text(text = "Rolls: $rollDisplay, Score: ${frame.score}")
         }
     }
 }
 
 
 // Enum to represent different types of rolls
-enum class RollType {
-    STRIKE, SPARE, MISS
+enum class RollType(var symbol: String) {
+    STRIKE("X"),
+    SPARE("/"),
+    MISS("-"),
+    REGULAR("")
 }
 
 // A frame represents a single round in bowling.
 data class Frame(
     val rolls: MutableList<Int> = mutableListOf(),
+    val rollTypes: MutableList<RollType> = mutableListOf(),
     var score: Int = 0
 )
 
@@ -113,8 +135,16 @@ class BowlingGameImpl : BowlingGame {
 
         val frame = frames[currentFrame]
 
+        val rollType = when {
+            pins == 10 && frame.rolls.size == 0 -> RollType.STRIKE
+            frame.rolls.size == 1 && frame.rolls[0] + pins == 10 -> RollType.SPARE
+            pins == 0 -> RollType.MISS
+            else -> RollType.REGULAR
+        }
+
         // Add the roll to the current frame
         frame.rolls.add(pins)
+        frame.rollTypes.add(rollType)
 
         if (pins == 10 && frame.rolls.size == 1) { // If strike, move to next frame (no second roll in the frame)
             currentFrame++
@@ -180,8 +210,6 @@ class BowlingGameImpl : BowlingGame {
     }
 
     private fun calculateScore() {
-//        if (isGameOver()) return
-
         // Calculate score for each frame
         frames.forEachIndexed { index, frame ->
             // Calculate for strikes, spares, and normal rolls
