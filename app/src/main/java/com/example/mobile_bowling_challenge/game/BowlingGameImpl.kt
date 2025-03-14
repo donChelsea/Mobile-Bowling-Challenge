@@ -85,7 +85,7 @@ class BowlingGameImpl : BowlingGame {
 
     private fun calculateScore() {
         val frame = frames[currentFrame]
-        // Calculate for strikes, spares, and normal rolls
+
         if (frame.rolls.isNotEmpty()) {
             frame.score = getScore()
             if (frame.rolls[0] == ALL_PINS && currentFrame < TENTH_FRAME) { // Strike

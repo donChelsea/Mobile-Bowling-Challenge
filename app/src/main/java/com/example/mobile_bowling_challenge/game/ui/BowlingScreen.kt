@@ -1,7 +1,6 @@
 package com.example.mobile_bowling_challenge.game.ui
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -14,7 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -31,7 +30,7 @@ fun BowlingScreen(
     bowlingGame: BowlingGameImpl,
     modifier: Modifier = Modifier
 ) {
-    var pins by remember { mutableIntStateOf(0) }
+    var pins by remember { mutableStateOf("") }
     val buttonText = if (bowlingGame.isGameOver()) R.string.game_over else R.string.submit_roll
 
     Column(
@@ -61,9 +60,9 @@ fun BowlingScreen(
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_20dp)))
 
         TextField(
-            value = pins.toString(),
+            value = pins,
             onValueChange = { newPins ->
-                pins = newPins.toIntOrNull() ?: 0
+                pins = newPins
             },
             label = { Text(stringResource(R.string.enter_pins)) }
         )
@@ -72,8 +71,8 @@ fun BowlingScreen(
 
         Button(
             onClick = {
-                bowlingGame.roll(pins)
-                pins = 0
+                bowlingGame.roll(pins.toInt())
+                pins = ""
             },
             enabled = !bowlingGame.isGameOver()
         ) {
