@@ -22,8 +22,8 @@ class BowlingGameImpl : BowlingGame {
 
         // Determine roll type before score calculation
         val rollType = when {
-            pins == 10 && frame.rolls.size == 0 -> RollType.STRIKE
-            frame.rolls.size == 1 && frame.rolls[0] + pins == 10 -> RollType.SPARE
+            pins == ALL_PINS && frame.rolls.size == 0 -> RollType.STRIKE
+            frame.rolls.size == 1 && frame.rolls[0] + pins == ALL_PINS -> RollType.SPARE
             pins == 0 -> RollType.MISS
             else -> RollType.REGULAR
         }
@@ -32,16 +32,15 @@ class BowlingGameImpl : BowlingGame {
         frame.rolls.add(pins)
         frame.rollTypes.add(rollType)
 
-        if (pins == 10 && frame.rolls.size == 1) { // If strike, move to next frame (no second roll)
+        if (pins == ALL_PINS && frame.rolls.size == 1) { // If strike, move to next frame (no second roll)
             currentFrame++
-        } else if (frame.rolls.size == 2) { // Regular roll
+        } else if (frame.rolls.size == MAX_ROLLS) { // Regular roll
             currentFrame++
         }
 
         // Add bonus frame after strike/spare at 10th frame
-        if (currentFrame == 10 && frame.rolls.sum() == 10) frames.add(Frame())
+        if (currentFrame == 10 && frame.rolls.sum() == ALL_PINS) frames.add(Frame())
 
-        // Calculate score after each roll
         calculateScore()
     }
 
@@ -58,31 +57,21 @@ class BowlingGameImpl : BowlingGame {
 
         val frame = frames[currentFrame]
         return when {
-            currentFrame == 9 -> {  // At 10th frame
-                if (frame.rolls.size == 2 && frame.rolls.sum() == 10) {
-                    2 // Spare in 10th frame, 2 rolls remaining
-                } else if (frame.rolls.size == 1 && frame.rolls[0] == 10) {
-                    2 // Strike in 10th frame, 2 rolls remaining
-                } else {
-                    0 // No extra roll needed in 10th frame
-                }
+            // For spare or strike in 10th frame, 2 rolls remaining otherwise no extra rolls
+            currentFrame == TENTH_FRAME -> {
+                if ((frame.rolls.size == MAX_ROLLS && frame.rolls.sum() == ALL_PINS) ||
+                    (frame.rolls.size == 1 && frame.rolls[0] == ALL_PINS)
+                ) MAX_ROLLS else 0
             }
 
-            frame.rolls.isEmpty() -> {
-                2 // First roll of a normal frame, 2 rolls left
-            }
+            // First roll of a normal frame, 2 rolls left
+            frame.rolls.isEmpty() -> MAX_ROLLS
 
-            frame.rolls.size == 1 -> {
-                if (frame.rolls[0] == 10) {
-                    0 // Strike, no second roll
-                } else {
-                    1 // First roll done, 1 roll left in normal frame
-                }
-            }
+            // Strike, no second roll otherwise first roll done, 1 roll left
+            frame.rolls.size == 1 -> if (frame.rolls[0] == ALL_PINS) 0 else 1
 
-            else -> {
-                0 // The frame is complete (2 rolls done or strike)
-            }
+            // The frame is complete (2 rolls done or strike)
+            else -> 0
         }
     }
 
@@ -100,9 +89,9 @@ class BowlingGameImpl : BowlingGame {
             // Calculate for strikes, spares, and normal rolls
             if (frame.rolls.isNotEmpty()) {
                 frame.score = frame.rolls.sum()
-                if (frame.rolls[0] == 10 && index < 9) { // Strike
+                if (frame.rolls[0] == ALL_PINS && index < TENTH_FRAME) { // Strike
                     frame.score += getStrikeBonus(index)
-                } else if (frame.rolls.size == 2 && frame.rolls.sum() == 10) { // Spare
+                } else if (frame.rolls.size == MAX_ROLLS && frame.rolls.sum() == ALL_PINS) { // Spare
                     frame.score += getSpareBonus(index)
                 }
             }
@@ -119,5 +108,11 @@ class BowlingGameImpl : BowlingGame {
         // If spare, add next roll from the following frame
         val nextFrame = frames.getOrNull(index + 1)
         return nextFrame?.rolls?.getOrNull(0) ?: 0
+    }
+
+    companion object {
+        const val ALL_PINS = 10
+        const val TENTH_FRAME = 9
+        const val MAX_ROLLS = 2
     }
 }
