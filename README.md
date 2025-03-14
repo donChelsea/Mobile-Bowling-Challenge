@@ -47,3 +47,10 @@ Here are some things we will be looking for when assessing your implementation
 1) Your code compiles
 2) Your score calculation is able to handle a variety of games
 3) Your code has 80% test coverage
+
+UPDATE:
+For this project, I chose to focus on architecture. I believe I went for this to show how I am passionate about 
+clean code, using comments to make the business logic easy to read through and understand, and also making sure that it is a 
+robust app, taking into account the constraints given. My goal wass to demonstrate maintainability, scalability, and testability of the codebase. 
+
+In the UI, I chose to demonstrate the fluidity and responsiveness of the components, and also ease of use. 
