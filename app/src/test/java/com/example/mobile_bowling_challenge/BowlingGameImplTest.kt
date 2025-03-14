@@ -1,7 +1,7 @@
 package com.example.mobile_bowling_challenge
 
 import com.example.mobile_bowling_challenge.game.BowlingGameImpl
-import com.example.mobile_bowling_challenge.model.BowlingGame
+import com.example.mobile_bowling_challenge.game.BowlingGame
 import com.example.mobile_bowling_challenge.model.Frame
 import com.example.mobile_bowling_challenge.model.RollType
 import org.junit.Assert.assertEquals
