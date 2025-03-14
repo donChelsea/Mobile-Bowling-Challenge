@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Mobile_Bowling_Challenge</string>
+    <string name="game_over">Game over</string>
+    <string name="enter_pins">Enter pins knocked down</string>
+    <string name="submit_roll">Submit roll</string>
+    <string name="label_frame">Frame: %d</string>
+    <string name="label_rolls_remaining">Rolls remaining: %d</string>
+    <string name="label_current_score">Current score: %d</string>
+    <string name="label_rolls_score">Rolls: %s, Score: %d</string>
 </resources>
