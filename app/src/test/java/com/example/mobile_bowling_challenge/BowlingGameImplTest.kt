@@ -28,19 +28,19 @@ class BowlingGameImplTest {
         mockFrames[0] = Frame(
             rolls = mutableListOf(5, 5),
             rollTypes = mutableListOf(RollType.REGULAR, RollType.SPARE),
-            score = 10
+            score = 20
         )
 
         mockFrames[1] = Frame(
             rolls = mutableListOf(10),
             rollTypes = mutableListOf(RollType.STRIKE),
-            score = 20
+            score = 30
         )
 
         mockFrames[2] = Frame(
             rolls = mutableListOf(0),
             rollTypes = mutableListOf(RollType.MISS),
-            score = 20
+            score = 30
         )
     }
 
@@ -62,7 +62,7 @@ class BowlingGameImplTest {
 
         val expectedRoll = 5
         val expectedRollType = RollType.REGULAR
-        val expectedScore = 10
+        val expectedScore = 20
 
         assertEquals(expectedRoll, actualRoll)
         assertEquals(expectedRollType, actualRollType)
@@ -77,7 +77,7 @@ class BowlingGameImplTest {
 
         val expectedRoll = 5
         val expectedRollType = RollType.SPARE
-        val expectedScore = 10
+        val expectedScore = 20
 
         assertEquals(expectedRoll, actualRoll)
         assertEquals(expectedRollType, actualRollType)
@@ -92,7 +92,7 @@ class BowlingGameImplTest {
 
         val expectedRoll = 10
         val expectedRollType = RollType.STRIKE
-        val expectedScore = 20
+        val expectedScore = 30
 
         assertEquals(expectedRoll, actualRoll)
         assertEquals(expectedRollType, actualRollType)
@@ -107,7 +107,7 @@ class BowlingGameImplTest {
 
         val expectedRoll = 0
         val expectedRollType = RollType.MISS
-        val expectedScore = 20
+        val expectedScore = 30
 
         assertEquals(expectedRoll, actualRoll)
         assertEquals(expectedRollType, actualRollType)
@@ -124,7 +124,7 @@ class BowlingGameImplTest {
 
     @Test
     fun testGetScore() {
-        val expected = 20
+        val expected = 30
         val actual = bowlingGameSubject.getScore()
 
         assertEquals(expected, actual)

@@ -6,6 +6,7 @@ import com.example.mobile_bowling_challenge.model.RollType
 class BowlingGameImpl : BowlingGame {
     private val frames = mutableListOf<Frame>()
     private var currentFrame = 0
+    private var gameScore = 0
 
     init {
         startGame()
@@ -20,7 +21,6 @@ class BowlingGameImpl : BowlingGame {
 
         val frame = frames[currentFrame]
 
-        // Determine roll type before score calculation
         val rollType = when {
             pins == ALL_PINS && frame.rolls.size == 0 -> RollType.STRIKE
             frame.rolls.size == 1 && frame.rolls[0] + pins == ALL_PINS -> RollType.SPARE
@@ -28,7 +28,6 @@ class BowlingGameImpl : BowlingGame {
             else -> RollType.REGULAR
         }
 
-        // Add the roll and roll type to the current frame
         frame.rolls.add(pins)
         frame.rollTypes.add(rollType)
 
@@ -49,7 +48,7 @@ class BowlingGameImpl : BowlingGame {
     }
 
     override fun getScore(): Int {
-        return frames.sumOf { it.rolls.sum() }
+        return gameScore
     }
 
     override fun getRemainingRolls(): Int {
@@ -84,14 +83,26 @@ class BowlingGameImpl : BowlingGame {
     }
 
     private fun calculateScore() {
-        val frame = frames[currentFrame]
+        var cumulativeScore = 0
 
-        if (frame.rolls.isNotEmpty()) {
-            frame.score = getScore()
-            if (frame.rolls[0] == ALL_PINS && currentFrame < TENTH_FRAME) { // Strike
-                frame.score += getStrikeBonus(currentFrame)
-            } else if (frame.rolls.size == MAX_ROLLS && frame.rolls.sum() == ALL_PINS) { // Spare
-                frame.score += getSpareBonus(currentFrame)
+        frames.forEachIndexed { index, frame ->
+            if (frame.rolls.isNotEmpty()) {
+                var frameScore = frame.rolls.sum()
+
+                // Add the cumulative score up to the previous frame
+                frameScore += cumulativeScore
+
+                if (frame.rolls[0] == ALL_PINS && index < TENTH_FRAME) {
+                    frameScore += getStrikeBonus(index)
+                } else if (frame.rolls.size == MAX_ROLLS && frame.rolls.sum() == ALL_PINS) {
+                    frameScore += getSpareBonus(index)
+                }
+
+                frame.score = frameScore
+
+                cumulativeScore = frame.score
+
+                gameScore = cumulativeScore
             }
         }
     }
