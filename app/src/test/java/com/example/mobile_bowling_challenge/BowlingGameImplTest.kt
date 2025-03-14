@@ -28,19 +28,22 @@ class BowlingGameImplTest {
         mockFrames[0] = Frame(
             rolls = mutableListOf(5, 5),
             rollTypes = mutableListOf(RollType.REGULAR, RollType.SPARE),
-            score = 20
+            score = 20,
+            isComplete = true
         )
 
         mockFrames[1] = Frame(
             rolls = mutableListOf(10),
             rollTypes = mutableListOf(RollType.STRIKE),
-            score = 30
+            score = 0,
+            isComplete = false
         )
 
         mockFrames[2] = Frame(
             rolls = mutableListOf(0),
             rollTypes = mutableListOf(RollType.MISS),
-            score = 30
+            score = 0,
+            isComplete = false
         )
     }
 
@@ -92,7 +95,7 @@ class BowlingGameImplTest {
 
         val expectedRoll = 10
         val expectedRollType = RollType.STRIKE
-        val expectedScore = 30
+        val expectedScore = 0
 
         assertEquals(expectedRoll, actualRoll)
         assertEquals(expectedRollType, actualRollType)
@@ -107,7 +110,7 @@ class BowlingGameImplTest {
 
         val expectedRoll = 0
         val expectedRollType = RollType.MISS
-        val expectedScore = 30
+        val expectedScore = 0
 
         assertEquals(expectedRoll, actualRoll)
         assertEquals(expectedRollType, actualRollType)
@@ -124,7 +127,7 @@ class BowlingGameImplTest {
 
     @Test
     fun testGetScore() {
-        val expected = 30
+        val expected = 20
         val actual = bowlingGameSubject.getScore()
 
         assertEquals(expected, actual)
