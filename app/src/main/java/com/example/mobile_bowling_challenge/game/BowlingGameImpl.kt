@@ -32,6 +32,8 @@ class BowlingGameImpl : BowlingGame {
         frame.rolls.add(pins)
         frame.rollTypes.add(rollType)
 
+        calculateScore()
+
         if (pins == ALL_PINS && frame.rolls.size == 1) { // If strike, move to next frame (no second roll)
             currentFrame++
         } else if (frame.rolls.size == MAX_ROLLS) { // Regular roll
@@ -40,8 +42,6 @@ class BowlingGameImpl : BowlingGame {
 
         // Add bonus frame after strike/spare at 10th frame
         if (currentFrame == 10 && frame.rolls.sum() == ALL_PINS) frames.add(Frame())
-
-        calculateScore()
     }
 
     override fun getCurrentFrame(): Int {
@@ -49,7 +49,7 @@ class BowlingGameImpl : BowlingGame {
     }
 
     override fun getScore(): Int {
-        return frames.sumOf { it.score }
+        return frames.sumOf { it.rolls.sum() }
     }
 
     override fun getRemainingRolls(): Int {
@@ -84,16 +84,14 @@ class BowlingGameImpl : BowlingGame {
     }
 
     private fun calculateScore() {
-        // Calculate score for each frame
-        frames.forEachIndexed { index, frame ->
-            // Calculate for strikes, spares, and normal rolls
-            if (frame.rolls.isNotEmpty()) {
-                frame.score = frame.rolls.sum()
-                if (frame.rolls[0] == ALL_PINS && index < TENTH_FRAME) { // Strike
-                    frame.score += getStrikeBonus(index)
-                } else if (frame.rolls.size == MAX_ROLLS && frame.rolls.sum() == ALL_PINS) { // Spare
-                    frame.score += getSpareBonus(index)
-                }
+        val frame = frames[currentFrame]
+        // Calculate for strikes, spares, and normal rolls
+        if (frame.rolls.isNotEmpty()) {
+            frame.score = getScore()
+            if (frame.rolls[0] == ALL_PINS && currentFrame < TENTH_FRAME) { // Strike
+                frame.score += getStrikeBonus(currentFrame)
+            } else if (frame.rolls.size == MAX_ROLLS && frame.rolls.sum() == ALL_PINS) { // Spare
+                frame.score += getSpareBonus(currentFrame)
             }
         }
     }
