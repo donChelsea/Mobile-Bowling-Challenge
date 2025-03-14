@@ -1,7 +1,7 @@
 package com.example.mobile_bowling_challenge
 
-import com.example.mobile_bowling_challenge.game.BowlingGame
 import com.example.mobile_bowling_challenge.game.BowlingGameImpl
+import com.example.mobile_bowling_challenge.model.BowlingGame
 import com.example.mobile_bowling_challenge.model.Frame
 import com.example.mobile_bowling_challenge.model.RollType
 import org.junit.Assert.assertEquals
@@ -62,14 +62,17 @@ class BowlingGameImplTest {
         val actualRoll = bowlingGameSubject.getGameState()[0].rolls[0]
         val actualRollType = bowlingGameSubject.getGameState()[0].rollTypes[0]
         val actualScore = bowlingGameSubject.getGameState()[0].score
+        val actualCompleted = bowlingGameSubject.getGameState()[0].isComplete
 
         val expectedRoll = 5
         val expectedRollType = RollType.REGULAR
         val expectedScore = 20
+        val expectedCompleted = true
 
         assertEquals(expectedRoll, actualRoll)
         assertEquals(expectedRollType, actualRollType)
         assertEquals(expectedScore, actualScore)
+        assertEquals(expectedCompleted, actualCompleted)
     }
 
     @Test
@@ -77,14 +80,17 @@ class BowlingGameImplTest {
         val actualRoll = bowlingGameSubject.getGameState()[0].rolls[1]
         val actualRollType = bowlingGameSubject.getGameState()[0].rollTypes[1]
         val actualScore = bowlingGameSubject.getGameState()[0].score
+        val actualCompleted = bowlingGameSubject.getGameState()[0].isComplete
 
         val expectedRoll = 5
         val expectedRollType = RollType.SPARE
         val expectedScore = 20
+        val expectedCompleted = true
 
         assertEquals(expectedRoll, actualRoll)
         assertEquals(expectedRollType, actualRollType)
         assertEquals(expectedScore, actualScore)
+        assertEquals(expectedCompleted, actualCompleted)
     }
 
     @Test
@@ -92,14 +98,17 @@ class BowlingGameImplTest {
         val actualRoll = bowlingGameSubject.getGameState()[1].rolls[0]
         val actualRollType = bowlingGameSubject.getGameState()[1].rollTypes[0]
         val actualScore = bowlingGameSubject.getGameState()[1].score
+        val actualCompleted = bowlingGameSubject.getGameState()[1].isComplete
 
         val expectedRoll = 10
         val expectedRollType = RollType.STRIKE
         val expectedScore = 0
+        val expectedCompleted = false
 
         assertEquals(expectedRoll, actualRoll)
         assertEquals(expectedRollType, actualRollType)
         assertEquals(expectedScore, actualScore)
+        assertEquals(expectedCompleted, actualCompleted)
     }
 
     @Test
@@ -107,14 +116,17 @@ class BowlingGameImplTest {
         val actualRoll = bowlingGameSubject.getGameState()[2].rolls[0]
         val actualRollType = bowlingGameSubject.getGameState()[2].rollTypes[0]
         val actualScore = bowlingGameSubject.getGameState()[2].score
+        val actualCompleted = bowlingGameSubject.getGameState()[2].isComplete
 
         val expectedRoll = 0
         val expectedRollType = RollType.MISS
         val expectedScore = 0
+        val expectedCompleted = false
 
         assertEquals(expectedRoll, actualRoll)
         assertEquals(expectedRollType, actualRollType)
         assertEquals(expectedScore, actualScore)
+        assertEquals(expectedCompleted, actualCompleted)
     }
 
     @Test

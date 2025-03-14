@@ -1,5 +1,6 @@
 package com.example.mobile_bowling_challenge.game
 
+import com.example.mobile_bowling_challenge.model.BowlingGame
 import com.example.mobile_bowling_challenge.model.Frame
 import com.example.mobile_bowling_challenge.model.RollType
 
