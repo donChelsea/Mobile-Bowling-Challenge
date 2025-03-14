@@ -101,8 +101,10 @@ fun BowlingGameStateView(frames: List<Frame>) {
                 }
             }.joinToString(", ", prefix = "[", postfix = "]")
 
+            val scoreDisplay = if (frame.isComplete) frame.score.toString() else 0
+
             Text(
-                text = stringResource(R.string.label_rolls_score, rollDisplay, frame.score),
+                text = stringResource(R.string.label_rolls_score, rollDisplay, scoreDisplay),
                 style = MaterialTheme.typography.headlineSmall
             )
 

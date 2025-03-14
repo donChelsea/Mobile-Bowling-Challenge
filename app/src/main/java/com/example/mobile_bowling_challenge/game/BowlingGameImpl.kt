@@ -20,27 +20,28 @@ class BowlingGameImpl : BowlingGame {
         if (isGameOver()) return
 
         val frame = frames[currentFrame]
+        val rolls = frame.rolls
 
         val rollType = when {
-            pins == ALL_PINS && frame.rolls.size == 0 -> RollType.STRIKE
-            frame.rolls.size == 1 && frame.rolls[0] + pins == ALL_PINS -> RollType.SPARE
+            pins == ALL_PINS && rolls.size == 0 -> RollType.STRIKE
+            rolls.size == 1 && rolls[0] + pins == ALL_PINS -> RollType.SPARE
             pins == 0 -> RollType.MISS
             else -> RollType.REGULAR
         }
 
-        frame.rolls.add(pins)
+        rolls.add(pins)
         frame.rollTypes.add(rollType)
 
         calculateScore()
 
-        if (pins == ALL_PINS && frame.rolls.size == 1) { // If strike, move to next frame (no second roll)
+        if (pins == ALL_PINS && rolls.size == 1) { // If strike, move to next frame (no second roll)
             currentFrame++
-        } else if (frame.rolls.size == MAX_ROLLS) { // Regular roll
+        } else if (rolls.size == MAX_ROLLS) { // Regular roll
             currentFrame++
         }
 
         // Add bonus frame after strike/spare at 10th frame
-        if (currentFrame == 10 && frame.rolls.sum() == ALL_PINS) frames.add(Frame())
+        if (currentFrame == 10 && rolls.sum() == ALL_PINS) frames.add(Frame())
     }
 
     override fun getCurrentFrame(): Int {
@@ -55,19 +56,21 @@ class BowlingGameImpl : BowlingGame {
         if (isGameOver()) return 0
 
         val frame = frames[currentFrame]
+        val rolls = frame.rolls
+
         return when {
             // For spare or strike in 10th frame, 2 rolls remaining otherwise no extra rolls
             currentFrame == TENTH_FRAME -> {
-                if ((frame.rolls.size == MAX_ROLLS && frame.rolls.sum() == ALL_PINS) ||
-                    (frame.rolls.size == 1 && frame.rolls[0] == ALL_PINS)
+                if ((rolls.size == MAX_ROLLS && rolls.sum() == ALL_PINS) ||
+                    (rolls.size == 1 && rolls[0] == ALL_PINS)
                 ) MAX_ROLLS else 0
             }
 
             // First roll of a normal frame, 2 rolls left
-            frame.rolls.isEmpty() -> MAX_ROLLS
+            rolls.isEmpty() -> MAX_ROLLS
 
             // Strike, no second roll otherwise first roll done, 1 roll left
-            frame.rolls.size == 1 -> if (frame.rolls[0] == ALL_PINS) 0 else 1
+            rolls.size == 1 -> if (rolls[0] == ALL_PINS) 0 else 1
 
             // The frame is complete (2 rolls done or strike)
             else -> 0
@@ -86,37 +89,78 @@ class BowlingGameImpl : BowlingGame {
         var cumulativeScore = 0
 
         frames.forEachIndexed { index, frame ->
-            if (frame.rolls.isNotEmpty()) {
-                var frameScore = frame.rolls.sum()
+            val rolls = frame.rolls
 
-                // Add the cumulative score up to the previous frame
-                frameScore += cumulativeScore
-
-                if (frame.rolls[0] == ALL_PINS && index < TENTH_FRAME) {
-                    frameScore += getStrikeBonus(index)
-                } else if (frame.rolls.size == MAX_ROLLS && frame.rolls.sum() == ALL_PINS) {
-                    frameScore += getSpareBonus(index)
+            if (rolls.isNotEmpty()) {
+                // If it's a strike and there are two subsequent rolls
+                if (rolls[0] == ALL_PINS && index < TENTH_FRAME) {
+                    // Ensure that the next two rolls are available
+                    if (frames.getOrNull(index + 1)?.rolls?.size == 2) {
+                        frame.isComplete = true
+                    }
                 }
 
-                frame.score = frameScore
+                // If it's a spare and there is a next roll
+                else if (rolls.size == MAX_ROLLS && rolls.sum() == ALL_PINS) {
+                    // Ensure that the next roll is available
+                    if (frames.getOrNull(index + 1)?.rolls?.isNotEmpty() == true) {
+                        frame.isComplete = true
+                    }
+                }
 
-                cumulativeScore = frame.score
+                // Regular frame
+                else {
+                    // Frame is complete once both rolls are done
+                    if (rolls.size == MAX_ROLLS) {
+                        frame.isComplete = true
+                    }
+                }
 
-                gameScore = cumulativeScore
+                if (frame.isComplete) {
+                    var frameScore = rolls.sum()
+                    frameScore += cumulativeScore
+
+                    // Add bonuses if it's a strike or spare
+                    if (rolls[0] == ALL_PINS && index < TENTH_FRAME) {
+                        frameScore += getStrikeBonus(index)
+                    } else if (rolls.size == MAX_ROLLS && rolls.sum() == ALL_PINS) {
+                        frameScore += getSpareBonus(index)
+                    }
+
+                    // Set the frame's score
+                    frame.score = frameScore
+                    cumulativeScore = frame.score
+                    gameScore = cumulativeScore
+                }
             }
         }
     }
 
+
     private fun getStrikeBonus(index: Int): Int {
         // If strike, add next two rolls from subsequent frames
         val nextFrame = frames.getOrNull(index + 1)
-        return (nextFrame?.rolls?.getOrNull(0) ?: 0) + (nextFrame?.rolls?.getOrNull(1) ?: 0)
+        val bonus = (nextFrame?.rolls?.getOrNull(0) ?: 0) + (nextFrame?.rolls?.getOrNull(1) ?: 0)
+
+        // Mark the current frame as complete only after getting the bonus
+        if (nextFrame?.rolls?.size == 2) {
+            frames[index].isComplete = true
+        }
+
+        return bonus
     }
 
     private fun getSpareBonus(index: Int): Int {
         // If spare, add next roll from the following frame
         val nextFrame = frames.getOrNull(index + 1)
-        return nextFrame?.rolls?.getOrNull(0) ?: 0
+        val bonus = nextFrame?.rolls?.getOrNull(0) ?: 0
+
+        // Mark the current frame as complete only getting the bonus
+        if (nextFrame?.rolls?.isNotEmpty() == true) {
+            frames[index].isComplete = true
+        }
+
+        return bonus
     }
 
     companion object {
